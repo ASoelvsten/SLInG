@@ -22,10 +22,9 @@ sam = 10000
 
 # Note that SLInG allows you to make a few explorations of the parameter space to iteratively set dabc_min to the value you request below.
 # You can easily do so when you have to pass an initial guess for the stepsize. For instance, if you pass an array with 3 values, SLInG will run three iterations:
-# stepsize = [1.,1.,1.]
-# Let's just skip the adjustment of dabc_min here:
+# stepsize = [1.,1.,1.]. Alternatively, we could skip the adjustment of dabc_min here: stepsize = [1.]
 
-stepsize = [1.]
+stepsize = [1.,1.,1.]
 
 # 5) Define your uniform priors that define the space that you want to explore:
 
@@ -41,7 +40,7 @@ ptype = "Laplace"
 
 # 7) What value of dabc_min would you like to try?
 
-dabc_min = 0.018
+dabc_min = 0.015
 
 # 8) If you were to know the ground truth you could define it here for comparison in the automated plots. If you don't know the groundtruth, just set a dummy array: 
 
