@@ -57,6 +57,8 @@ def cauchy_density(theta,epsilon):
 
 #============================================================
 # The model in question
+# If you introduce a new model, you need to call it here.
+# You can define it in modellib.py or in a seperate script.
 
 def model(theta,x_obs,name,yi=[],disttype="Chi2"):
 
@@ -108,6 +110,8 @@ def distance(y_sim,y_obs,var_obs,var_sim,disttype="Chi2"):
 
 #============================================================
 # Calling different observational data for implemented examples.
+# If you create a new model, you need to define the corresponding observations
+# to which you compare here.
 
 def observations(theta_obs,name,spls=1.,disttype="Chi2",direc="./"):
 

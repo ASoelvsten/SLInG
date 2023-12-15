@@ -41,7 +41,7 @@ ptype = "Laplace"
 
 # 7) What value of dabc_min would you like to try?
 
-dabc_min = 0.015
+dabc_min = 0.018
 
 # 8) If you were to know the ground truth you could define it here for comparison in the automated plots. If you don't know the groundtruth, just set a dummy array: 
 
