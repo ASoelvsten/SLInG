@@ -2,27 +2,7 @@ import numpy as np
 from scipy.integrate import odeint # Solves systems of ordinary differential equations
 import matplotlib.pyplot as plt
 
-#============================================================
-
-def linHD(theta,x_obs):
-
-    y_sim = theta[0]*100 + theta[1]*x_obs + theta[2] *100*np.sin(theta[3]/5.*x_obs) + theta[4]*x_obs**2 
-
-    return y_sim
-
-#============================================================
-
-def lin2HD(theta,x_obs):
-
-    y_sim = theta[0] + theta[1]*x_obs + theta[2]*x_obs**2 + theta[3]*np.sin(theta[4]*2*np.pi*x_obs) + theta[5]*np.tan(theta[6]*2*np.pi*x_obs) + theta[7]*np.exp(theta[8]*x_obs)
-
-    return y_sim
-
-#============================================================
-
-def linsin(theta,x_obs):
-    y_sim = theta[0]*x_obs[:,0]+theta[1]*100*np.sin(x_obs[:,1]/5)
-    return y_sim
+# This script contains different simple models
 
 #============================================================
 
@@ -117,6 +97,7 @@ def solve_LV(theta, t=np.linspace(0,100,1000), param0 = [10,10]):
     return y_sim
 
 #============================================================
+# Appears in paper
 
 def efron(theta,x_obs):
 

@@ -1,0 +1,51 @@
+\documentclass[border=0.2cm]{standalone}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{automata, arrows.meta, positioning}
+
+\begin{document}
+
+\begin{tikzpicture}[x=0.5cm,y=0.5cm,z=0.3cm,>=stealth]
+% The axes
+\draw[-{Stealth[length=3mm]}] (xyz cs:x=-10.5) -- (xyz cs:x=11) node[above] {$\theta_1$};
+\draw[-{Stealth[length=3mm]}] (xyz cs:y=-10.5) -- (xyz cs:y=11) node[right] {$\theta_2$};
+\draw[-{Stealth[length=3mm]}] (xyz cs:z=-10.5) -- (xyz cs:z=11) node[above] {$\theta_3$};
+% The thin ticks
+\foreach \coo in {-10,-9,...,10}
+{
+  \draw (\coo,-1.5pt) -- (\coo,1.5pt);
+  \draw (-1.5pt,\coo) -- (1.5pt,\coo);
+  \draw (xyz cs:y=-0.15pt,z=\coo) -- (xyz cs:y=0.15pt,z=\coo);
+}
+
+% Dashed lines for the points P, Q
+\draw[dashed] (-5.5,0) -- (-5.5,4.5,0);
+\draw[dashed] (-5.5,0) -- (-5.5,0,6);
+\draw[-{Stealth[length=2.5mm]},color=black!40!green] (-5.5,0,6) -- (0,0,6);
+\draw[-{Stealth[length=2.5mm]},color=black!40!green] (-5.5,4.5,0) -- (-5.5,4.5,6);
+\draw[-{Stealth[length=2.5mm]},color=black!40!green] (-5.5,4.5,6) -- (-5.5,0,6);
+\draw[dashed] (0,4.5,6) -- (0,0,6);
+\draw[dashed] (0,4.5,6) -- (0,4.5,0);
+\draw[dashed] (-5.5,4.5,0) -- (0,4.5,0);
+\draw[dashed] (-5.5,4.5,6) -- (0,4.5,6);
+
+\node[text width=3cm, color=teal] at (9.7,1) 
+    {Activation};
+
+\node[text width=3cm, color=purple] at (-7,-1) 
+    {Repression};
+    
+\node[text width=3cm, color=black!40!green] at (-5.7,6.5) 
+    {$\alpha(d,\delta_\mathrm{ABC},q,\pi)$};    
+
+% Dots
+\node[fill,circle,inner sep=1.5pt,label={[color=black!40!green]left:$\boldsymbol{\theta}_i$},color=black!40!green] at (-5.5,4.5) {};
+\node[fill,circle,inner sep=1.5pt,label={[color=black!40!green]right:$\boldsymbol{\theta}_{i+1}$},color=black!40!green] at (0,0,6) {};
+
+% The origin
+\node[align=center] at (6,-5) (ori) {\text{If $\theta_k$ is irrelevant, it's driven to 0.}};
+\draw[-{Stealth[length=2.5mm]},help lines,shorten >=6pt] (ori) .. controls (5,-2) and (1.2,-1.5) .. (0,0,0);
+\end{tikzpicture}
+
+\end{document}

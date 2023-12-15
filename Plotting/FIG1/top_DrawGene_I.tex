@@ -1,0 +1,40 @@
+\documentclass[border=0.2cm]{standalone}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{automata, arrows.meta, positioning}
+
+\usepackage{pgfplots}
+\begin{document}
+
+\pgfmathdeclarefunction{prior}{6}{%
+  \pgfmathparse{((x<1.5)*0.4) +((x>1.5)*0.7)  }%
+}
+
+\begin{tikzpicture}
+\begin{axis}[no markers, domain=0:6.5, samples=1000,
+  x axis line style = {-{Stealth[scale=1.5]}},
+  y axis line style = {-{Stealth[scale=1.5]}},
+  axis lines* = middle, xlabel={\Large $t$}, ylabel={\Large $I$},
+  every axis y label/.style={at=(current axis.above origin),anchor=south},
+  every axis x label/.style={at=(current axis.right of origin),anchor=west},
+  height=10cm, width=12cm,
+  ymin = 0,ymax =1,
+  enlargelimits=false, clip=false, 
+  set layers,   
+  axis on top,
+  xtick={1.5}, ytick=\empty,
+  xticklabels={\Large $t(I_1 \rightarrow I_2)$},
+  ]
+  \addplot [very thick,black] {prior(0.5,2,2.5,-1,1.,0.3)};
+\end{axis}
+
+\node[text width=2cm, color=black] at (1.8,3.8) 
+    {\Large $I_1$};
+\node[text width=2cm, color=black] at (7.8,6.4) 
+    {\Large $I_2$};
+ 
+\draw[dashed,line width=0.3mm,color=gray] (2.4,0) -- (2.4,8.4);
+
+\end{tikzpicture}
+\end{document}

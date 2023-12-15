@@ -1,0 +1,43 @@
+\documentclass[border=0.2cm]{standalone}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{automata, arrows.meta, positioning}
+
+\usepackage{pgfplots}
+\begin{document}
+
+\pgfmathdeclarefunction{prior}{1}{%
+  \pgfmathparse{#1/2*exp(-(#1*sqrt(x^2)))}%
+}
+
+\begin{tikzpicture}
+\begin{axis}[no markers, domain=-3:3, samples=500,
+  x axis line style = {-{Stealth[scale=1.5]}},
+  y axis line style = {-{Stealth[scale=1.5]}},
+  axis lines* = middle, xlabel=$\theta_k$, ylabel=$\pi(\theta_k|\epsilon_k)$,
+  every axis y label/.style={at=(current axis.above origin),anchor=south},
+  every axis x label/.style={at=(current axis.right of origin),anchor=west},
+  height=5cm, width=12cm,
+  xtick=\empty, ytick=\empty,
+  extra x ticks={0},
+  enlargelimits=false, clip=false, 
+  set layers,   
+  axis on top,
+  grid = major,
+%  y axis line style={draw opacity=0}
+  ]
+  \addplot [very thick,red!80!black] {prior(1)};
+  \addplot [very thick,orange!80!black] {prior(8)};
+\end{axis}
+
+\node[text width=2cm, color=orange!80!black] at (6.7,1.7) 
+    {Large $\epsilon_k$};
+\node[text width=2cm, color=red!80!black] at (2.7,0.5) 
+    {Small $\epsilon_k$};
+\node[text width=8cm, color=black] at (4.51,4.5) 
+    {\large \textbf{Truncated Laplace prior distribution}};
+
+
+\end{tikzpicture}
+\end{document}
