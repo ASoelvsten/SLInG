@@ -1,32 +1,51 @@
 ##################################################
-#         ____  _     ___        ____            #
-#        / ___|| |   |_ _|_ __  / ___|           #
-#        \___ \| |    | || '_ \| |  _            #
-#         ___) | |___ | || | | | |_| |           #
-#        |____/|_____|___|_| |_|\____|           #
+#          ____  _     ___        ____           #
+#         / ___|| |   |_ _|_ __  / ___|          #
+#         \___ \| |    | || '_ \| |  _           #
+#          ___) | |___ | || | | | |_| |          #
+#         |____/|_____|___|_| |_|\____|          #
 #                                                #
 ##################################################
 
 # DESCRIBTION:
-# Script for finding best parameter set based on input data.
+#
+# Sparse, Likelihood-free INference using Gibbs (SLInG).
+#
+# For more details, please consult our paper:
+#
+# https://www.biorxiv.org/content/10.1101/2023.09.15.557764v1
+#
+# Please cite this paper if you use SLInG in your research.
+#
 # The Gibbs sampler is based on a Metropolis-Hastings algorithm
 # following the suggestions given by Turner and Van Zandt in their paper
 # "Hierarchical Approximate Bayesian Computation", while also drawing on
 # the paper "The Bayesian Lasso" by Park and Casella. Following their approaches
 # allows us to avoid any reference to the likelihood as well as to obtain efficient
-# dimension reduction of the parameter space.
+# dimension reduction of the parameter space, i.e., to perform model discovery.
+# 
+# The function gibbs_sampler() is the sparse sampling algorithm, i.e. the heart of SLInG. To run 
+# SLInG iteratively, call the function chain() (cf. example_01.py. Calling SLInG in this way
+# will also result in a set of standard plots). 
+# All possible ABC distance measures are contained in the function distance(). 
+# To define a new model, include it in the function model() (this can be a call of an external module). 
+# Load the data that you aim to fit by including it (via a function call) in the function 
+# observations(). To see how to run SLInG and what the different input variables mean, 
+# we refer to the script example_01.py.
+#
+#============================================================
 
-#import simple_network as sinesa
+#import simple_network as sinesa # This import statement requires pyJulia.
 import numpy as np
 import matplotlib.pyplot as plt
 import modellib
 from tqdm import tqdm
-from joblib import Parallel, delayed
+#from joblib import Parallel, delayed
 from sklearn.datasets import load_diabetes
-import pygtc
-from scipy.interpolate import splrep, splev, splprep
+import pygtc # Only required for automated plotting
+#from scipy.interpolate import splrep, splev, splprep
 import time
-import tensorflow
+#import tensorflow
 import pickle
 from scipy.spatial import distance as ssdis
 from numpy import linalg as nli
@@ -111,7 +130,15 @@ def distance(y_sim,y_obs,var_obs,var_sim,disttype="Chi2"):
 #============================================================
 # Calling different observational data for implemented examples.
 # If you create a new model, you need to define the corresponding observations
-# to which you compare here.
+# to which you compare by including it here.
+#
+# Note that the observations (i.e., the data that you aim to fit) will automatically be 
+# saved in the corresponding folder as a file called observations.npy (and observations_xobs.npy).
+# If you set the parameter newobs to False when calling the function chain() and copy an
+# existing observation file into your directory, you can perform the inference based on this
+# file rather than relying on calling observations(). You hence don't need to define your data
+# through the function observations() if you already have a file in the right format. Note that newobs
+# is False by default, i.e. SLInG will look for an existing file first.
 
 def observations(theta_obs,name,spls=1.,disttype="Chi2",direc="./"):
 
@@ -167,7 +194,7 @@ def ParamPrior(truncation,theta_k, k):
     return P
 
 #============================================================
-# Main algorithm.
+# Main function: Sparse sampling algorithm. The function "chain" calls this iteratively.
 
 def gibbs_sampler(x_obs,y_obs, var_obs, name, direc = "./", truncation = [], sparsity_prior = [], dabc_min = 1.0, dabc_scale = 1000, ptype="Laplace", disttype ="Euclidean", count = 0, burnin = 200, samples = 2000, theta_obs = [10,15,0], dabc = None, step = 1., theta = [], epsilon0 = None,y_int=[],betas = [1.0],ns=30):
 
@@ -396,7 +423,9 @@ def gibbs_sampler(x_obs,y_obs, var_obs, name, direc = "./", truncation = [], spa
         return theta_t, EPS, dist, ACC, x_obs, y_obs, y_int, dabc, steps
 
 #============================================================
-# Plotting function.
+# Plotting function. Creates a few standard plots that help interpret the output. The function "gibbs_sampler" above also
+# saves a handful of (.txt) files with all samples that underlie these plots.
+# Note that the plotting requires the installation of pygtc.
 
 def summary_plots(theta_t, EPS, dist, x_obs, y_obs, y_int, var_obs, name, burnin, truths, direc = "./", disttype="Chi2", ptype="Laplace"):
 
@@ -488,6 +517,7 @@ def summary_plots(theta_t, EPS, dist, x_obs, y_obs, y_int, var_obs, name, burnin
 
 #============================================================
 # Function calling sampler iteratively as well as plotting function.
+# The reason for calling the sampler in this manner is merely to iteratively adjust dabc_min to the value set by the user. 
 
 def chain(name, theta_obs, truncation, direc="./", sparsity_prior = [] ,dabc_min =1.0, ptype="Laplace", theta_int = [], dabc_scale = 15., count_start =0, disttype = "Euclidean", burnin = 500, samples = 2000, samples_scouts = 1000, stepsize = [1.,1.,1.],spls=1.,newobs=False):
 
@@ -495,18 +525,28 @@ def chain(name, theta_obs, truncation, direc="./", sparsity_prior = [] ,dabc_min
 
     if newobs == False:
         ofile = direc + "/observations.npy"
-        if os.path.exists(ofile) and name !="Diabetes" and name!="LinearD":
+        if os.path.exists(ofile):
             print("Loading observations")
-            x_obs = []
+            xfile = direc+"/observations_xobs.npy"
+            if os.path.exists(xfile):
+                x_obs = np.load(xfile)
+            else:
+                x_obs = []
             y_int = []
-            y_obs = np.load(direc+"./observations.npy")
+            y_obs = np.load(direc+"/observations.npy")
             var_obs = 1.0
         else:
-            x_obs, y_obs, y_int, var_obs, theta_obs = observations(theta_obs,name,spls=spls,disttype=disttype,direc=direc)
+            print("NO OBSERVATION FILE FOUND. Setting newobs to True.")
+            newobs = True
 
-            np.save(direc+"/observations.npy",y_obs)
+    if newobs == True:
+        x_obs, y_obs, y_int, var_obs, theta_obs = observations(theta_obs,name,spls=spls,disttype=disttype,direc=direc)
 
-            print("Saved observations...")
+        np.save(direc+"/observations.npy",y_obs)
+        if x_obs != []:
+            np.save(direc+"/observations_xobs.npy",x_obs)
+
+        print("Saved observations...")
 
 #    print("OBS:", y_obs)
 
